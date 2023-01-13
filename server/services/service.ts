@@ -93,6 +93,8 @@ export class Service {
         return undefined;
     }
 
+    async createMessage(_message: { content: string, title?: string, reply?: Message, documents: any[], receivers: { id: Id, group?: Id }[] }): Promise<any> {}
+
     async getEvents(_start?: string, _end?: string): Promise<Event[]> {
         return [];
     }

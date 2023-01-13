@@ -5,7 +5,7 @@ import { LoginParams } from "./types/index";
 import { getGrades } from "./grades";
 import { createDocument, deleteDocument, getDocument, getDocuments } from "./documents";
 import { getWorkspaces } from "./utils";
-import { getMessage, getMessages } from "./messages";
+import { createMessage, getMessage, getMessages } from "./messages";
 import { editHomework, getHomeworks } from "./homeworks";
 import { getEvents } from "./events";
 import { createBinder, deleteBinder, editBinder } from "./binders";
@@ -114,6 +114,12 @@ export class EcoleDirecteService extends Service {
     async getMessage(id: Id, type: MessageType): Promise<Message> {
         return this.fromCache("message", { id, type });
     }
+
+    async createMessage({ content, title, documents, receivers, reply }: { content: string, title?: string, documents: any[], receivers: { id: Id, group?: Id}[], reply?: Message }) {
+        return createMessage(this.account, this.#token, { content, title, documents, receivers, reply });
+    }
+
+    async editMessage(id: Id, { binder, archived }) {}
 
     async getHomeworks(start?: string, end?: string): Promise<Homework[]> {
         return this.fromCache("homeworks", { start, end });

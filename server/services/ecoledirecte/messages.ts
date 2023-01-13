@@ -44,3 +44,27 @@ function message(raw: APIMessage): Message {
         documents: raw.files?.map(({ id, libelle, date, type }) => ({ id, name: libelle, type, kind: "file", date: new Date(date) })) || [],
     };
 }
+
+export async function createMessage(account: Account, token: string, { content, title, receivers, documents, reply }: { content: string, title?: string, receivers: { id: Id, group?: Id }[], documents: any[], reply?: Message }) {
+    const groups = receivers.reduce((arr, receiver) => receiver.group && (typeof receiver.group !== "string" || (receiver.group.toLowerCase() !== "teachers" && receiver.group.toLowerCase() !== "staff")) && !arr.find((id) => id === receiver.group) ? [...arr, receiver.group] : arr, []);
+    const staffMembers = receivers.filter(({ group }) => typeof group === "string" && group?.toLowerCase() === "staff");
+    const teachers = receivers.filter(({ group }) => typeof group === "string" && group?.toLowerCase() === "teachers");
+
+    return request(`${
+        account.type === "PARENT" ? "familles" : account.type === "TEACHER" ? "enseignants" : account.type === "STAFF" ? "personnels" : "eleves"
+    }/${account.id}/messages`, { token, method: "POST", data: { message: {
+        content: encodeURIComponent(btoa(content)),
+        groupesDestinataires: [
+            ...(staffMembers.length ? [{ selection: { type: "A" }, destinataires: staffMembers.map(({ id }) => ({ id })) }]: []),
+            ...(teachers.length ? [{ selection: { type: "P", ...(account.classes?.[0]?.id ? { isPP: false, classe: { estNote: 1, id: account.classes[0].id }, classes: [{ estNote: 1, id: account.classes[0].id }] } : {}) }, destinataires: teachers.map(({ id }) => ({ id })) }]: []),
+            ...groups.map((g) => ({ selection: { type: "W", espaceTravail: { id: g } }, destinataires: receivers.filter(({ group }) => group === g).map(({ id }) => id) })),
+        ],
+        subject: reply ? `Re: ${reply.title}` : title,
+        brouillon: false,
+        files: documents?.map(({ name, unc }) => ({ unc, libelle: name, data: { unc }, code: 200, message: unc })) || [],
+        ...(reply ? {
+            responseId: reply.id,
+            transfertFiles: [],
+        } : {}),
+    }, anneeMessages: "" } })
+}
