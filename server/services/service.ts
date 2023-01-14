@@ -1,6 +1,6 @@
 import { CACHE_DURATION } from "config";
-import { Account, Binder, DocumentData, DocumentFeature, Documents, Event, Grades, Homework, HomeworkStatus, Id, Message, Messages, MessageType, Obj } from "types/index";
-import { isDeepStrictEqual } from "util";
+import { Account, Binder, DocumentData, DocumentFeature, Documents, Event, Grades, Homework, HomeworkStatus, Id, Message, Messages, MessageType, Obj, Remark } from "types/index";
+import { isDeepStrictEqual } from "utils/index";
 
 export class Service {
     account: Account = undefined;
@@ -95,7 +95,13 @@ export class Service {
 
     async createMessage(_message: { content: string, title?: string, reply?: Message, documents: any[], receivers: { id: Id, group?: Id }[] }): Promise<any> {}
 
+    async editMessage(_old: Message, _message: Message): Promise<any> {}
+
     async getEvents(_start?: string, _end?: string): Promise<Event[]> {
+        return [];
+    }
+
+    async getRemarks(): Promise<Remark[]> {
         return [];
     }
 }

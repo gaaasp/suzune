@@ -9,10 +9,18 @@ export async function getDocuments(account: Account, token: string, raw: APIAcco
     if (!workspaces) {
         workspaces = await getWorkspaces(account, token, raw);
     };
+    const cloud = folder ? { all: {}, homes: [] } as Documents : await getWorkspace(account, token, "cloud");
     const possibleWorkspaces = workspaces.workspaces.filter(({ options }) => options.documents);
-    let workspacesDocuments = {
-        all: {},
-        homes: possibleWorkspaces.map(({ id }) => id),
+    let workspacesDocuments: Documents = {
+        all: {
+            "workspaces": {
+                id: "workspaces",
+                name: "Espaces de travail",
+                kind: "folder",
+                children: [...possibleWorkspaces.map(({ id }) => id), cloud.all[Object.keys(cloud.all).sort((a, b) => a.length - b.length)[0]]?.id],
+            }
+        },
+        homes: ["workspaces"]
     };
     possibleWorkspaces.forEach(({ id, name, description, type, options, date, owner, size }) => {
         workspacesDocuments.all[id] = {
@@ -29,7 +37,7 @@ export async function getDocuments(account: Account, token: string, raw: APIAcco
         };
     });
 
-    return { workspaces, documents: folder ? await getWorkspace(account, token, folder) : fusion(await getCategories(account, token), workspacesDocuments) };
+    return { workspaces, documents: folder ? await getWorkspace(account, token, folder) : fusion(await getCategories(account, token), fusion(cloud, workspacesDocuments)) };
 };
 
 export async function getDocument(token: string, document: Document): Promise<DocumentData> {
@@ -139,7 +147,7 @@ export async function getWorkspace(account: Account, token: string, folder: stri
 
             doc(document);
 
-            return { all, homes: [document.id] };
+            return { all, homes: [] };
         }
     );
 };

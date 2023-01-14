@@ -14,7 +14,7 @@ export async function getMessages(account: Account, token: string, type: Message
         binder ? "classeur" : type
     }`, { token, method: "GETALL" })
         .then(({ messages, classeurs }) => ({
-            binders: classeurs.map(({ id, libelle }) => ({ id, name: libelle })),
+            binders: [/*{ id: "ARCHIVED", name: "Archivés", editable: false },*/ ...classeurs.map(({ id, libelle }) => ({ id, name: libelle, editable: true }))],
             sent: messages.sent.map(message),
             received: messages.received.map(message),
         }));
@@ -42,6 +42,7 @@ function message(raw: APIMessage): Message {
         },
         receivers: raw.to?.map(({ id, nom, prenom}) => ({ id, name: `${prenom} ${nom}` })) || [],
         documents: raw.files?.map(({ id, libelle, date, type }) => ({ id, name: libelle, type, kind: "file", date: new Date(date) })) || [],
+        _raw: raw,
     };
 }
 
@@ -53,7 +54,7 @@ export async function createMessage(account: Account, token: string, { content, 
     return request(`${
         account.type === "PARENT" ? "familles" : account.type === "TEACHER" ? "enseignants" : account.type === "STAFF" ? "personnels" : "eleves"
     }/${account.id}/messages`, { token, method: "POST", data: { message: {
-        content: encodeURIComponent(btoa(content)),
+        content: encodeURIComponent(btoa(reply ? replyContent(content, reply) : content)),
         groupesDestinataires: [
             ...(staffMembers.length ? [{ selection: { type: "A" }, destinataires: staffMembers.map(({ id }) => ({ id })) }]: []),
             ...(teachers.length ? [{ selection: { type: "P", ...(account.classes?.[0]?.id ? { isPP: false, classe: { estNote: 1, id: account.classes[0].id }, classes: [{ estNote: 1, id: account.classes[0].id }] } : {}) }, destinataires: teachers.map(({ id }) => ({ id })) }]: []),
@@ -67,4 +68,45 @@ export async function createMessage(account: Account, token: string, { content, 
             transfertFiles: [],
         } : {}),
     }, anneeMessages: "" } })
+}
+
+export function replyContent(content: string, reply: Message) {
+    return `${content}
+
+<p><br />
+<b>De ${reply.author.name}</b><br />
+<i>(le ${reply.date
+		.toLocaleDateString("fr-FR", {
+			weekday: "long",
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+		})
+		.replaceAll("é", "&eacute;")
+		.replaceAll("û", "&ucirc;")} &agrave; ${reply.date.toLocaleTimeString(
+		"fr-FR",
+		{
+			hour: "2-digit",
+			minute: "2-digit",
+		}
+	)})</i></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<blockquote>
+${reply.content}
+</blockquote>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+`;
+}
+
+export async function editMessage(account: Account, token: string, message: Message, newMessage: Message) {
+    return request(`${
+        account.type === "PARENT" ? "familles" : account.type === "TEACHER" ? "enseignants" : account.type === "STAFF" ? "personnels" : "eleves"
+    }$/${account.id}/messages`, { token, method: "PUT", data: {
+        action: "deplacer",
+        ids: [`${message.id}:${message._raw.idDossier}`],
+        idClasseur: newMessage.binders[0],
+    }});
 }

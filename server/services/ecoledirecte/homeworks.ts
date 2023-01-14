@@ -56,8 +56,8 @@ async function getDayHomeworks(account: Account, token: string, day: string): Pr
                 },
                 returned: aFaire?.documentsRendus?.map(({ libelle, date, taille }) => ({ name: libelle, date: new Date(date.replace(" ", "T")), size: taille })) || [],
                 comments: aFaire?.commentaires?.map(({ id, auteur, message, date }) => ({ id, author: auteur, content: message && decodeText(message), date: new Date(date) })) || [],
-            };
-        }));
+            } as Homework;
+        }).filter(({ content, session, documents, options }) => content || session || documents?.length || options?.uploadable));
 }
 
 async function getHomeworksSummary(account: Account, token: string): Promise<Homework[]> {

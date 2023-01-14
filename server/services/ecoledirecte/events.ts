@@ -9,7 +9,7 @@ export async function getEvents(account: Account, token: string, start: string, 
         .then((events) => events
             .filter(({ id }) => id !== 0)
             .map(({ id, typeCours, start_date, end_date, prof, salle, text, matiere, codeMatiere, isAnnule }) => {
-                s = safe(codeMatiere, matiere, s);
+                s = matiere && codeMatiere ? safe(codeMatiere, matiere, s) : s;
                 return {
                     id,
                     type: codeMatiere === "DST" ? "EXAM" : typeCours === "COURS" ? "LESSON" : "SPECIAL",
@@ -17,11 +17,11 @@ export async function getEvents(account: Account, token: string, start: string, 
                     end: new Date(end_date.replace(" ", "T")),
                     teacher: prof,
                     room: salle,
-                    title: text,
-                    subject: {
+                    title: (codeMatiere && s[codeMatiere]?.name) || text,
+                    subject: codeMatiere && s[codeMatiere] ? {
                         name: s[codeMatiere].name,
                         emoji: s[codeMatiere].emoji
-                    },
+                    } : null,
                     options: {
                         cancelled: isAnnule,
                     },

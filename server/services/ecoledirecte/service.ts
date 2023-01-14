@@ -1,14 +1,15 @@
 import { Service } from "services/service";
-import { Binder, DocumentData, DocumentFeature, Documents, Event, Grades, Homework, HomeworkStatus, Id, Message, Messages, MessageType } from "types/index";
+import { Binder, DocumentData, DocumentFeature, Documents, Event, Grades, Homework, HomeworkStatus, Id, Message, Messages, MessageType, Remark } from "types/index";
 import { login } from "./auth";
 import { LoginParams } from "./types/index";
 import { getGrades } from "./grades";
 import { createDocument, deleteDocument, getDocument, getDocuments } from "./documents";
 import { getWorkspaces } from "./utils";
-import { createMessage, getMessage, getMessages } from "./messages";
+import { createMessage, editMessage, getMessage, getMessages } from "./messages";
 import { editHomework, getHomeworks } from "./homeworks";
 import { getEvents } from "./events";
 import { createBinder, deleteBinder, editBinder } from "./binders";
+import { getRemarks } from "./remarks";
 
 export class EcoleDirecteService extends Service {
     #_raw = undefined;
@@ -30,6 +31,7 @@ export class EcoleDirecteService extends Service {
             message: ({ id, type }: { type: MessageType; id: Id }) => getMessage(this.account, this.#token, id, type),
             homeworks: ({ start, end }: { start: string; end: string }) => getHomeworks(this.account, this.#token, start, end),
             events: ({ start, end }: { start: string, end: string }) => getEvents(this.account, this.#token, start, end),
+            remarks: () => getRemarks(this.account, this.#token),
         });
     }
 
@@ -40,7 +42,7 @@ export class EcoleDirecteService extends Service {
                     ([key, fn]) => [
                         key,
                         [
-                            (params: any) => fn(params).catch((err: any) => {
+                            (params: any) => !(this.#token && this.account) ? this.login().then(() => fn(params)) : fn(params).catch((err: any) => {
                                 if (err?.message && err?.code && err.code !== 404 && !err.message.toLowerCase().includes("ip")) {
                                     this.login(this.params as LoginParams).then(() => fn(params));
                                 } else throw err;
@@ -119,7 +121,9 @@ export class EcoleDirecteService extends Service {
         return createMessage(this.account, this.#token, { content, title, documents, receivers, reply });
     }
 
-    async editMessage(id: Id, { binder, archived }) {}
+    async editMessage(old: Message, message: Message) {
+        return editMessage(this.account, this.#token, old, message);
+    }
 
     async getHomeworks(start?: string, end?: string): Promise<Homework[]> {
         return this.fromCache("homeworks", { start, end });
@@ -131,5 +135,9 @@ export class EcoleDirecteService extends Service {
     
     async getEvents(start?: string, end?: string): Promise<Event[]> {
         return this.fromCache("events", { start, end });
+    }
+
+    async getRemarks(): Promise<Remark[]> {
+        return this.fromCache("remarks");
     }
 };

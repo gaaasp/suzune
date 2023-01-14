@@ -150,20 +150,21 @@ export const subjects = [
 
 export function safe(id: Id, name: string, s: { [key: string]: { name: string, emoji: string } }) {
     if (!s[id]) {
+        const normalizedName = name
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+
         const subject = subjects.find(
             ({ includes }) => includes.find(
                 (intersection) => !intersection.find(
-                    (text) => !name
-                        .normalize("NFD")
-                        .replace(/[\u300-\u36f]/g, "")
-                        .toLowerCase()
-                        .includes(text)
+                    (text) => !normalizedName.includes(text)
                 )
             )
         );
         s[id] = {
             name: subject?.name || name,
-            emoji: subject?.emoji || "",
+            emoji: subject?.emoji || "📖",
         };
     }
     return s;

@@ -4,5 +4,6 @@ export * from "./events";
 export * from "./grades";
 export * from "./homeworks";
 export * from "./messages";
+export * from "./remarks";
 export * from "./request";
 export * from "./workspaces";

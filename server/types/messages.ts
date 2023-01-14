@@ -18,6 +18,7 @@ export type Message = {
         id: Id;
         name: string;
     }[];
+    _raw: any;
 };
 
 export type MessageType = "sent" | "received";
