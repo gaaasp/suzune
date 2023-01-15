@@ -8,16 +8,16 @@ const app = new Hono();
 
 console.log("🚀", "Suzune successfully started!");
 
-function withAccount(c, fn) {
+async function withAccount(c, fn) {
     const accessToken = c.req.cookies["access-token"];
     const refreshToken = c.req.cookies["refresh-token"];
     if (accessToken && refreshToken) {
-        const { data, error } = supabase.auth.setSession({
+        const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
         });
 
-        if (error) {
+        if (error || !data) {
             c.status(400);
             return c.text("User is not authenticated");
         } else {
@@ -29,8 +29,8 @@ function withAccount(c, fn) {
     }
 }
 
-app.get("/homeworks", c => withAccount(c, (data) => {
-    console.log(data);
+app.get("/", c => withAccount(c, async (data) => {
+    return c.json(data);
 }));
 
 export default {
