@@ -49,6 +49,7 @@ export async function getDocument(token: string, document: Document): Promise<Do
         .then((arrayBuffer) => (
             {
                 type: fileType,
+                name: `${splitName[0]}.${extension}`,
                 content: arrayBuffer,
             }
         ));
@@ -125,8 +126,15 @@ export async function getCategories(account: Account, token: string): Promise<Do
 };
 
 export async function getWorkspace(account: Account, token: string, folder: string): Promise<Documents> {
-    const [id, ...folderArr] = folder.split("/");
-    return request<[APICloudDocument]>(`cloud/${id === "cloud" ? `${account.type === "STUDENT" || account.type === "PARENT" ? "E" : account.type === "TEACHER" ? "P" : "A"}/${account.id}` : `W/${id}`}?idFolder=${folderArr.length ? encodeURI(`\\${folderArr.join("\\")}`): ""}`, { token })
+    const splitFolder = folder.split("\\");
+    let [_, _1, t, id, ...folderArr] = splitFolder;
+    if (t !== "W") {
+        id = "cloud";
+    }
+    if (splitFolder.length === 1) {
+        id = folder;
+    }
+    return request<[APICloudDocument]>(`cloud/${id === "cloud" ? `${account.type === "STUDENT" || account.type === "PARENT" ? "E" : account.type === "TEACHER" ? "P" : "A"}/${account.id}` : `W/${id}`}?idFolder=${folderArr.length ? encodeURI("\\" + folderArr.join("\\")): ""}`, { token })
         .then(([document]) => {
             let all = {};
             function doc(raw: APICloudDocument) {
@@ -147,7 +155,7 @@ export async function getWorkspace(account: Account, token: string, folder: stri
 
             doc(document);
 
-            return { all, homes: [] };
+            return { all, homes: [document.id] };
         }
     );
 };

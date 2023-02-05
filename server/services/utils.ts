@@ -1,20 +1,27 @@
-import { encrypt } from "utils/encryption";
-import { supabase } from "utils/supabase";
+import { supabase } from "utils/index";
+import { Id } from "types/index";
 
-export async function createService({ user, type, params: p }) {
-    const { iv, params, tag } = encrypt(p);
+export async function createIntegration({ user, service, params }) {
     const { error } = await supabase
-        .from("services")
+        .from("integrations")
         .insert({
-            type,
-            iv,
             params,
-            tag,
-            user
+            service,
+            user_id: user
         });
 
     return !error;
 }
 
-export async function getService(id: string) {
+export async function getIntegrations(user: Id) {
+    const { data, error } = await supabase
+        .from("integrations")
+        .select()
+        .eq("user_id", user);
+
+    if (error) {
+        return [];
+    } else {
+        return data;
+    };
 }

@@ -17,7 +17,7 @@
 </script>
 
 <Wrapper title="Settings">
-    <Text h2>Services</Text>
+    <Text h2>Integrations</Text>
     <section class="bg-elevated rounded-md border border-separator px-4 py-2 space-y-3">
         <header>
             <Text h3>Add new</Text>
@@ -25,7 +25,7 @@
         <Separator />
         <main class="flex flex-col space-y-2">
             <div>
-                <Select label="Service name" bind:value={service}>
+                <Select label="Service" bind:value={service}>
                     <option value="pronote">Pronote</option>
                     <option value="ecoledirecte">EcoleDirecte</option>
                 </Select>

@@ -22,6 +22,7 @@ export type Documents = {
 
 export type DocumentData = {
     type: string;
+    name: string;
     content: ArrayBuffer;
 };
 
