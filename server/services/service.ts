@@ -4,11 +4,13 @@ import { isDeepStrictEqual } from "utils/index";
 
 export class Service {
     account: Account = undefined;
+    id: Id = undefined;
     params: Obj = undefined;
     cache: { [key: string]: [Function, [number, any, any][]] } = {}
 
-    constructor(params: Obj) {
+    constructor(params: Obj, id: Id) {
         this.params = params;
+        this.id = id;
     }
 
     async addToCache(key: string, value: any, params?: any) {
@@ -49,7 +51,7 @@ export class Service {
 
     async deleteBinder(_id: Id): Promise<any> {}
 
-    async getDocuments(_folder?: string): Promise<Documents> {
+    async getDocuments(_folder?: Id): Promise<Documents> {
         return {
             all: {},
             homes: [],
@@ -59,6 +61,7 @@ export class Service {
     async getDocument(_id: Id): Promise<DocumentData> {
         return {
             type: "",
+            name: "",
             content: new ArrayBuffer(0),
         };
     }

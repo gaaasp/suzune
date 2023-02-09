@@ -16,8 +16,8 @@ export class EcoleDirecteService extends Service {
     #token = undefined;
     #documents = {};
 
-    constructor(params: LoginParams) {
-        super(params);
+    constructor(params: LoginParams, id: Id) {
+        super(params, id);
         this.cache = this.#cacheFunctions({
             workspaces: () => getWorkspaces(this.account, this.#token, this.#_raw),
             documents: async (folder?: string) => getDocuments(this.account, this.#token, this.#_raw, folder, await this.fromCache("workspaces")).then(({ documents, workspaces }) => {
@@ -93,7 +93,7 @@ export class EcoleDirecteService extends Service {
         return this.fromCache("grades");
     }
 
-    async getDocuments(folder?: string): Promise<Documents> {
+    async getDocuments(folder?: Id): Promise<Documents> {
         return this.fromCache("documents", folder);
     }
 

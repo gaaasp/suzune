@@ -5,7 +5,7 @@ import { request } from "./request";
 import { APIAccount, APICloudDocument, APIDocument, APIDocuments, Workspaces } from "./types/index";
 import { getWorkspaces } from "./utils";
 
-export async function getDocuments(account: Account, token: string, raw: APIAccount, folder?: string, workspaces?: Workspaces): Promise<{ documents: Documents; workspaces: Workspaces }> {
+export async function getDocuments(account: Account, token: string, raw: APIAccount, folder?: Id, workspaces?: Workspaces): Promise<{ documents: Documents; workspaces: Workspaces }> {
     if (!workspaces) {
         workspaces = await getWorkspaces(account, token, raw);
     };
@@ -125,14 +125,14 @@ export async function getCategories(account: Account, token: string): Promise<Do
         )
 };
 
-export async function getWorkspace(account: Account, token: string, folder: string): Promise<Documents> {
-    const splitFolder = folder.split("\\");
+export async function getWorkspace(account: Account, token: string, folder: Id): Promise<Documents> {
+    const splitFolder = folder.toString().split("\\");
     let [_, _1, t, id, ...folderArr] = splitFolder;
     if (t !== "W") {
         id = "cloud";
     }
     if (splitFolder.length === 1) {
-        id = folder;
+        id = folder.toString();
     }
     return request<[APICloudDocument]>(`cloud/${id === "cloud" ? `${account.type === "STUDENT" || account.type === "PARENT" ? "E" : account.type === "TEACHER" ? "P" : "A"}/${account.id}` : `W/${id}`}?idFolder=${folderArr.length ? encodeURI("\\" + folderArr.join("\\")): ""}`, { token })
         .then(([document]) => {

@@ -1,7 +1,7 @@
 import { supabase } from "utils/index";
-import { Id } from "types/index";
+import { Id, Obj } from "types/index";
 
-export async function createIntegration({ user, service, params }) {
+export async function createIntegration({ user, service, params }: { user: Id; service: string; params: Obj }) {
     const { error } = await supabase
         .from("integrations")
         .insert({

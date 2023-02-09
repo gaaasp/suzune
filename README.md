@@ -9,6 +9,7 @@ Suzune is an attempt to centralize all school services into one
 - Documents
 - Messages
 - Schedule (events)
+- Remarks
 
 ## Services
 
