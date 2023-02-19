@@ -16,6 +16,11 @@ module.exports = {
                 dark: "var(--highlight-dark)",
                 light: "var(--highlight-light)",
             },
+            red: {
+                DEFAULT: "var(--red)",
+                dark: "var(--red-dark)",
+                light: "var(--red-light)",
+            },
         },
     },
   },

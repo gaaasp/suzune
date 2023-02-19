@@ -1,16 +1,18 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { supabase } from "utils/index";
 import { Account } from "account/class";
 
 let accounts = {};
 
 const app = new Hono();
+app.use("*", cors({ origin: ["http://192.168.1.24:5173", "http://localhost:5173"], credentials: true }));
 
 console.log("🚀", "Suzune successfully started!");
 
 async function withAccount(c: any, fn: (account: Account) => any) {
-    const accessToken = c.req.cookies["access-token"];
-    const refreshToken = c.req.cookies["refresh-token"];
+    const accessToken = c.req.cookie("access-token") || c.req.query("access-token");
+    const refreshToken = c.req.cookie("refresh-token") || c.req.query("refresh-token");
     if (accessToken && refreshToken) {
         const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -19,16 +21,19 @@ async function withAccount(c: any, fn: (account: Account) => any) {
 
         if (error || !data) {
             c.status(400);
+            console.log(error);
             return c.text("User is not authenticated");
         } else {
-            if (!accounts[data.id]) {
-                accounts[data.id] = new Account(data.id);
+            const id = data.user.id;
+            if (!accounts[id]) {
+                accounts[id] = new Account(id);
             }
-            accounts[data.id].session = data;
-            return fn(accounts[data.id]);
+            accounts[id].session = data;
+            const returned = await fn(accounts[id]);
+            return returned instanceof Response ? returned : c.json(returned);
         };
     } else {
-        c.status(400)
+        c.status(400);
         return c.text("User is not authenticated");
     }
 }

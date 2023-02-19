@@ -57,6 +57,8 @@ export class EcoleDirecteService extends Service {
 
     get config() {
         return {
+            id: "ecoledirecte",
+            name: "EcoleDirecte",
         };
     }
 

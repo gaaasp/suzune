@@ -7,6 +7,8 @@
     export let secondary = false;
     export let tertiary = false;
     export let small = false;
+    export let large = false;
+    export let error = false;
 
     export let as: string = "";
 
@@ -23,6 +25,8 @@
         "text-secondary-label": secondary,
         "text-tertiary-label text-sm": tertiary,
         "text-sm": small,
+        "text-lg font-semibold": large,
+        "text-red": error,
     });
 </script>
 

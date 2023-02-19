@@ -1,0 +1,25 @@
+import type { Grades as G } from "./grades";
+
+export type Integration<Data> = {
+    id: number;
+    service: {
+        id: string;
+        name: string;
+    };
+    user: {
+        name: string;
+        id: number | string;
+        type: string;
+        schools: {
+            name: string;
+            id: number | string;
+        }[];
+        classes: {
+            name: string;
+            id: number | string;
+        }[];
+    };
+    data: Data;
+};
+
+export type Grades = Integration<G>[];

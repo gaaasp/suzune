@@ -32,7 +32,10 @@ export class Service {
     }
 
     get config() {
-        return {};
+        return {
+            id: "",
+            name: "",
+        };
     }
 
     async login(_params: Obj): Promise<any> {}

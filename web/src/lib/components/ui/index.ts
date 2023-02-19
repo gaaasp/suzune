@@ -3,6 +3,7 @@ export { default as Button } from "./button.svelte";
 export { default as Header } from "./header.svelte";
 export { default as Input } from "./input.svelte";
 export { default as Labelled } from "./labelled.svelte";
+export { default as List } from "./list.svelte";
 export { default as Logo } from "./logo.svelte";
 export { default as Nav } from "./nav.svelte";
 export { default as Select } from "./select.svelte";

@@ -3,7 +3,7 @@
     import { cn } from "$lib/utils";
 </script>
 <nav>
-    <ul class="flex w-page overflow-x-auto">
+    <ul class="flex w-page overflow-x-auto h-10 px-2">
         {#each [
             { name: "Dashboard", path: "/" },
             { name: "Homeworks", path: "/homeworks" },
@@ -13,10 +13,17 @@
             { name: "Events", path: "/events" },
             { name: "Remarks", path: "/remarks" },
         ] as { name, path } (path)}
-        <li><a class={cn(
-            $page.url.pathname === path ? "text-label" : "text-tertiary-label hover:text-secondary-label active:text-label focus:text-secondary-label",
-            "px-2",
-        )} href={path}>{name}</a></li>
+            <li class="h-full">
+                <a class={cn(
+                    $page.url.pathname === path ? "text-label" : "text-tertiary-label hover:text-secondary-label active:text-label focus:text-secondary-label",
+                    "px-2 h-full flex items-center justify-center relative",
+                )} href={path}>
+                    <p>{name}</p>
+                    {#if $page.url.pathname === path}
+                        <div class="absolute bottom-0 w-full h-0.5 bg-label" />
+                    {/if}
+                </a>
+            </li>
         {/each}
     </ul>
 </nav>

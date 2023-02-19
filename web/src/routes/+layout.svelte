@@ -3,6 +3,7 @@
     import { invalidate } from "$app/navigation";
     import { onMount } from "svelte";
     import "../app.css";
+    import { logOut } from "$lib/stores";
 
     onMount(() => {
         const {
@@ -13,7 +14,8 @@
                 const expires = new Date(0).toUTCString()
                 document.cookie = `access-token=; path=/; expires=${expires}; SameSite=Lax; secure`
                 document.cookie = `refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`
-            } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+                logOut();
+            } else {
                 const maxAge = 100 * 365 * 24 * 60 * 60 // 100 years, never expires
                 document.cookie = `access-token=${session?.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`
                 document.cookie = `refresh-token=${session?.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`

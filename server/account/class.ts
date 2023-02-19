@@ -16,17 +16,24 @@ export class Account {
 
     async getIntegrations() {
         const integrations = await getIntegrations(this.id)
-        this.integrations = integrations.map(({ id, service, params }) => {
+        this.integrations = await Promise.all(integrations.map(async ({ id, service, params }) => {
             const integration = this.integrations.find(s => s.id === id);
             if (integration) {
                 return integration;
             } else {
                 const s = new SERVICES[service](params, id);
-                s.login();
+                await s.login();
                 return s;
             }
-        });
-        return integrations;
+        }));
+        return this.integrations.map(service => ({
+            id: service.id,
+            service: {
+                id: service.config.id,
+                name: service.config.name,
+            },
+            user: service.account,
+        }));
     }
 
     async createIntegration({ params, service }: { params: Obj, service: string }) {
@@ -35,14 +42,22 @@ export class Account {
     }
 
     async #forIntegrations(integrations: string, fn: (service: Service) => any) {
+        if (this.integrations.length === 0) {
+            await this.getIntegrations();
+        }
         let i = this.integrations;
         if (integrations) {
             const parsedIntegrations = integrations.split(",");
             i = i.filter(integration => parsedIntegrations.find(id => id === integration.id));
         }
-        return Promise.all(i.map(async service => ({
-            id: service.id,
-            data: await fn(service),
+        return Promise.all(i.map(async integration => ({
+            id: integration.id,
+            service: {
+                id: integration.config.id,
+                name: integration.config.name,
+            },
+            user: integration.account,
+            data: await fn(integration),
         })));
     }
 

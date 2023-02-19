@@ -3,9 +3,9 @@
 </script>
 <div>
     <button on:click={async () => {
-        const { data, error } = await supabase.auth.signInWithOAuth({
+        const { data } = await supabase.auth.signInWithOAuth({
             provider: "github",
         });
-        console.log(data, error);
+        console.log(data);
     }}>Continue with GitHub</button>
 </div>

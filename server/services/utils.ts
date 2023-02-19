@@ -10,6 +10,8 @@ export async function createIntegration({ user, service, params }: { user: Id; s
             user_id: user
         });
 
+    console.log(error);
+
     return !error;
 }
 

@@ -12,6 +12,9 @@
         --highlight: #0070f3;
         --highlight-dark: #0761d1;
         --highlight-light: #3291ff;
+        --red: red;
+        --red-dark: #e60000;
+        --red-light: #f33;
     }
     
     @media screen and (prefers-color-scheme: dark) {
@@ -26,6 +29,8 @@
 
             --highlight-light: #0761d1;
             --highlight-dark: #3291ff;
+            --red-light: #e60000;
+            --red-dark: #f33;
         }
     }
 
