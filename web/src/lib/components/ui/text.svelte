@@ -9,8 +9,11 @@
     export let small = false;
     export let large = false;
     export let error = false;
+    export let quaternary = false;
 
     export let as: string = "";
+    let className: string = "";
+    export { className as class };
 
     $: component = as || (
         h1 ? "h1" :
@@ -24,10 +27,11 @@
         "text-xl font-semibold": h3,
         "text-secondary-label": secondary,
         "text-tertiary-label text-sm": tertiary,
+        "text-quaternary-label text-xs": quaternary,
         "text-sm": small,
-        "text-lg font-semibold": large,
+        "text-lg": large,
         "text-red": error,
-    });
+    }, className);
 </script>
 
 <svelte:element class={className} this={component}>

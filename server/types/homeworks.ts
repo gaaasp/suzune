@@ -1,5 +1,5 @@
-import { Document } from "./documents";
-import { Id } from "./utils";
+import type { Document } from "./documents";
+import type { Id } from "./utils";
 
 export type Homework = {
     id: Id;

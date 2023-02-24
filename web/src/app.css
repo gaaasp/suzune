@@ -1,11 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 @tailwind base;
 @layer base {
     :root {
         --base: #fff;
         --label: #000;
         --secondary-label: #444;
-        --tertiary-label: #444;
+        --tertiary-label: #666;
+        --quaternary-label: #666;
         --elevated: #fafafa;
+        --elevated-translucid: #fafafa99;
         --separator: #eaeaea;
         --opaque-separator: #999;
 
@@ -23,7 +27,9 @@
             --label: #fff;
             --secondary-label: #eaeaea;
             --tertiary-label: #999;
+            --quaternary-label: #999;
             --elevated: #111;
+            --elevated-translucid: #11111199;
             --separator: #333;
             --opaque-separator: #444;
 

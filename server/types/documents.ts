@@ -1,4 +1,4 @@
-import { BoolObj, Id } from "./utils";
+import type { BoolObj, Id } from "./utils";
 
 export type Document = {
     id: Id;

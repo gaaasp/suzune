@@ -1,4 +1,5 @@
 import type { Grades as G } from "./grades";
+import type { Homework } from "./homeworks";
 
 export type Integration<Data> = {
     id: number;
@@ -23,3 +24,4 @@ export type Integration<Data> = {
 };
 
 export type Grades = Integration<G>[];
+export type Homeworks = Integration<Homework[]>[];

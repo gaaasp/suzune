@@ -1,4 +1,3 @@
-import { getRemarks } from "services/ecoledirecte/remarks";
 import { SERVICES } from "services/list";
 import { Service } from "services/service";
 import { createIntegration, getIntegrations } from "services/utils"

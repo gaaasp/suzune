@@ -1,10 +1,12 @@
 <script lang="ts">
     import { Separator, Text } from ".";
 
-    export let values: any[];
+    type T = $$Generic<{ id: string | number }>;
+
+    export let values: T[] | undefined;
     export let empty: string;
 </script>
-<div class="bg-base rounded-md border border-separator flex flex-col">
+<div class="bg-base rounded-md border border-separator flex flex-col overflow-x-hidden">
     {#if values}
         {#each values as value, i (value.id)}
             {#if i !== 0}

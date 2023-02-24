@@ -6,13 +6,15 @@ import { Account } from "account/class";
 let accounts = {};
 
 const app = new Hono();
-app.use("*", cors({ origin: ["http://192.168.1.24:5173", "http://localhost:5173"], credentials: true }));
+app.use("*", cors({ origin: ["http://192.168.1.24:5173", "http://localhost:5173"], allowHeaders: ["X-Auth-Token"] }));
 
 console.log("🚀", "Suzune successfully started!");
 
 async function withAccount(c: any, fn: (account: Account) => any) {
-    const accessToken = c.req.cookie("access-token") || c.req.query("access-token");
-    const refreshToken = c.req.cookie("refresh-token") || c.req.query("refresh-token");
+    const token = c.req.cookie("supabase-auth-token") || c.req.headers.get("X-Auth-Token");
+    const parsedToken = token && JSON.parse(token);
+    const accessToken = parsedToken[0];
+    const refreshToken = parsedToken[1];
     if (accessToken && refreshToken) {
         const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -64,6 +66,9 @@ app
             }
         }))
     ))
+    .options("*", (c) => {
+        return c.json({ success: true })
+      })
 ;
 
 export default {

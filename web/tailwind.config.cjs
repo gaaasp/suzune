@@ -8,7 +8,11 @@ module.exports = {
             label: "var(--label)",
             "secondary-label": "var(--secondary-label)",
             "tertiary-label": "var(--tertiary-label)",
-            elevated: "var(--elevated)",
+            "quaternary-label": "var(--quaternary-label)",
+            elevated: {
+                DEFAULT: "var(--elevated)",
+                translucid: "var(--elevated-translucid)",
+            },
             separator: "var(--separator)",
             "opaque-separator": "var(--opaque-separator)",
             highlight: {
@@ -22,6 +26,9 @@ module.exports = {
                 light: "var(--red-light)",
             },
         },
+        fontFamily: {
+            sans: ["Inter"],
+        }
     },
   },
   plugins: [],

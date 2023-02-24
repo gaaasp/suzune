@@ -7,7 +7,7 @@
 
 {#if label}
     <svelte:element this={as} class="space-y-0.5">
-        <Text tertiary>{label}</Text>
+        <Text quaternary>{label?.toLocaleUpperCase()}</Text>
         <slot />
     </svelte:element>
 {:else}

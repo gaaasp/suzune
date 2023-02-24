@@ -1,6 +1,8 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import { Button, Input, List, Select, Separator, Text, Wrapper } from "$lib/components/ui";
-    import { integrations } from "$lib/stores";
+    import { integrations, logOut } from "$lib/stores";
+    import { supabase } from "$lib/supabase";
     import { request } from "$lib/utils";
     import { onMount } from "svelte";
 
@@ -71,4 +73,9 @@
             </div>
         </div>
     </List>
+    <Button on:click={() => {
+        supabase.auth.signOut();
+        logOut();
+        goto("/login");
+    }}>Log out</Button>
 </Wrapper>
