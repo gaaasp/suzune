@@ -3,9 +3,9 @@ import { writable } from "svelte/store";
 
 export const integrations = writable([]);
 export const homeworks = writable<Homeworks>([]);
-export const grades = writable<Grades>([]);
+export const grades = writable<Grades>();
 export const integration = writable(0);
-export const period = writable(0);
+export const period = writable<number>();
 
 export function logOut() {
     integrations.set([]);

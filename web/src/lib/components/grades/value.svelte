@@ -4,7 +4,7 @@
     import { Text } from "../ui";
 
     export let grade: Grade;
-    export let denominator: number;
+    export let denominator: number = 20;
     export let secondary = false;
 </script>
 

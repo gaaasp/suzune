@@ -43,6 +43,7 @@ export class EcoleDirecteService extends Service {
                         key,
                         [
                             (params: any) => !(this.#token && this.account) ? this.login().then(() => fn(params)) : fn(params).catch((err: any) => {
+                                console.log(err);
                                 if (err?.message && err?.code && err.code !== 404 && !err.message.toLowerCase().includes("ip")) {
                                     this.login(this.params as LoginParams).then(() => fn(params));
                                 } else throw err;

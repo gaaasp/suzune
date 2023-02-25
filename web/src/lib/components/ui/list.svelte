@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { Separator, Text } from ".";
+    import { Card, Separator, Text } from ".";
+    import { Skeleton, SkeletonGroup } from "../loading";
 
     type T = $$Generic<{ id: string | number }>;
 
     export let values: T[] | undefined;
     export let empty: string;
 </script>
-<div class="bg-base rounded-md border border-separator flex flex-col overflow-x-hidden">
+<Card>
     {#if values}
         {#each values as value, i (value.id)}
             {#if i !== 0}
@@ -18,5 +19,20 @@
                 <Text>{empty}</Text>
             </div>
         {/each}
+    {:else}
+        <SkeletonGroup class="space-y-4 px-4 py-3">
+            <div class="space-y-2">
+                <Skeleton class="h-6 w-40" />
+                <Skeleton class="h-4 w-28" />
+            </div>
+            <div class="space-y-2">
+                <Skeleton class="h-6 w-48" />
+                <Skeleton class="h-4 w-32" />
+            </div>
+            <div class="space-y-2">
+                <Skeleton class="h-6 w-32" />
+                <Skeleton class="h-4 w-24" />
+            </div>
+        </SkeletonGroup>
     {/if}
-</div>
+</Card>

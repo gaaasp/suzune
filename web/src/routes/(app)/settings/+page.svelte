@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { Button, Input, List, Select, Separator, Text, Wrapper } from "$lib/components/ui";
+    import { Button, Card, Input, List, Select, Separator, Text, Wrapper } from "$lib/components/ui";
     import { integrations, logOut } from "$lib/stores";
     import { supabase } from "$lib/supabase";
     import { request } from "$lib/utils";
@@ -38,7 +38,7 @@
 
 <Wrapper title="Settings">
     <Text h2>Integrations</Text>
-    <form class="bg-elevated rounded-md border border-separator px-4 py-2 space-y-3">
+    <Card as="form" elevated class="px-4 py-2 space-y-3">
         <header>
             <Text h3>Add new</Text>
         </header>
@@ -59,7 +59,7 @@
             <Text tertiary>New services are often added</Text>
             <Button disabled={!valid || loading} on:click={addService}>Add</Button>
         </footer>
-    </form>
+    </Card>
     <List empty="No integration added" values={i} let:child={integration}>
         <div class="px-4 py-3 flex items-center space-x-4">
             <img class="h-8 w-8 rounded-full border border-separator" alt={`${integration.service.name}'s logo`} src={`/logos/${integration.service.id}.png`} />

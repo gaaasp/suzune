@@ -1,9 +1,10 @@
 <script lang="ts">
     import { Text } from ".";
     import { cn } from "$lib/utils";
+    import { Skeleton, SkeletonGroup } from "../loading";
 
     export let name: string;
-    export let items: { label: string; value: string | number }[];
+    export let items: { label: string; value: string | number }[] | undefined;
     export let value: string | number;
 </script>
 <div class="border border-separator rounded-md flex h-10 bg-elevated">
@@ -16,5 +17,9 @@
                 <input type="radio" name={name} value={item.value} bind:group={value} class="hidden" />
             </label>
         {/each}
+    {:else}
+        <SkeletonGroup>
+            <Skeleton class="h-10 w-full sm:w-48" />
+        </SkeletonGroup>
     {/if}
 </div>

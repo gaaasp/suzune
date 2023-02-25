@@ -1,17 +1,18 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { GradeValue } from "$lib/components/grades";
-    import { Back, Emoji, Labelled, List, MainHeader, Switch, Text, Wrapper } from "$lib/components/ui";
-    import { grades, period } from "$lib/stores";
-    import { capitalize, formatDate, formatGrade, list, request } from "$lib/utils";
+    import { GradeItem, GradeValue } from "$lib/components/grades";
+    import { Skeleton, SkeletonGroup } from "$lib/components/loading";
+    import { Back, Emoji, Information, List, MainHeader, Switch, Text, Wrapper } from "$lib/components/ui";
+    import { loadGrades } from "$lib/load";
+    import { grades, period, integration as i } from "$lib/stores";
+    import { capitalize, formatDate, formatGrade, list } from "$lib/utils";
     import { onMount } from "svelte";
 
     onMount(() => {
-        request("grades").then(g => grades.set(g));
+        loadGrades($period, $i);
     });
 
     $: integration = $grades?.find(({ id }) => id?.toString() === $page.params.integration);
-
     $: periods = integration?.data?.periods?.filter(({ subjects }) => subjects.find(({ id }) => id?.toString() === $page.params.subject));
     $: subject = (periods?.[$period] || periods?.[0])?.subjects?.find(({ id }) => id?.toString() === $page.params.subject);
 
@@ -22,15 +23,15 @@
         },
         {
             label: "Class average",
-            value: formatGrade(subject?.average),
+            value: typeof subject?.average === "number" ? formatGrade(subject?.average) : "",
         },
         {
             label: "Minimum average",
-            value: formatGrade(subject?.min),
+            value: typeof subject?.min === "number" ? formatGrade(subject?.min) : "",
         },
         {
             label: "Maximum average",
-            value: formatGrade(subject?.max),
+            value: typeof subject?.max === "number" ? formatGrade(subject?.max) : "",
         },
         {
             label: "Teachers",
@@ -40,41 +41,30 @@
             label: "Coefficient",
             value: formatGrade(subject?.coefficient),
         },
-    ].filter(({ value }) => value)
+    ];
 </script>
 <Wrapper title={subject?.name || "Grade"}>
     <MainHeader slot="header">
         <Back href="/grades" />
         <div class="sm:flex sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-            <Text h1>{subject?.emoji} {subject?.name}</Text>
+            {#if subject}
+                <Text h1>{subject?.emoji} {subject?.name}</Text>
+            {:else}
+                <SkeletonGroup>
+                    <Skeleton class="h-10 w-48" />
+                </SkeletonGroup>
+            {/if}
             <Switch
                 name="period"
-                items={periods?.map(({ name }, i) => ({ label: name, value: i })) || []}
+                items={periods?.map(({ name }, i) => ({ label: name, value: i }))}
                 bind:value={$period}
             />
         </div>
-        {#if subject}
-            <div class="grid gap-3 grid-cols-2 sm:grid-cols-4">
-                {#each items as item}
-                    <Labelled label={item.label}>
-                        <Text>{item.value}</Text>
-                    </Labelled>
-                {/each}
-            </div>
-        {/if}
+        <Information {items} />
     </MainHeader>
-    <List let:child={grade} values={subject?.grades} empty="No grade">
-        <a href={`/${integration?.id}/grades/${grade.id}`} class="flex hover:bg-elevated">
-            <Emoji>{subject?.emoji}</Emoji>
-            <div class="py-1 flex items-center justify-between flex-1 mr-2">
-                <div>
-                    <Text>{grade.name}</Text>
-                    {#if grade.date}
-                        <Text tertiary>{capitalize(formatDate(grade.date))}</Text>
-                    {/if}
-                </div>
-                <GradeValue grade={grade} denominator={integration?.data?.denominator || 20} />
-            </div>
-        </a>
-    </List>
+    {#if subject}
+        <List let:child={grade} values={subject?.grades} empty="No grade">
+            <GradeItem href={`/${integration?.id}/grades/${grade.id}`} {grade} {subject} denominator={integration?.data?.denominator} />
+        </List>
+    {/if}
 </Wrapper>
