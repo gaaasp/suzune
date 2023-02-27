@@ -59,12 +59,11 @@ app
         return account.getEvents(c.req.query("integrations"), c.req.query("start") || first.toISOString().split("T")[0], c.req.query("end") || last.toISOString().split("T")[0]);
     }))
     .get("/documents/:id", (c: any) => withAccount(c, account => account.getDocument(c.req.query("integrations"), c.req.param("id"))
-        .then(([{ data }]) => new Response(data.content, {
-            headers: {
-                "Content-Type": data.type,
-                "Content-Disposition": `inline; filename="${encodeURIComponent(data.name)}"`,
-            }
-        }))
+        .then(([{ data }]) => {
+            c.header("Content-Type", data.type);
+            c.header("Content-Disposition", `inline; filename="${encodeURIComponent(data.name)}"`)
+            return c.body(data.content);
+        })
     ))
     .options("*", (c) => {
         return c.json({ success: true })

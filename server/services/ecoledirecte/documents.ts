@@ -9,14 +9,15 @@ export async function getDocuments(account: Account, token: string, raw: APIAcco
     if (!workspaces) {
         workspaces = await getWorkspaces(account, token, raw);
     };
-    const cloud = folder ? { all: {}, homes: [] } as Documents : await getWorkspace(account, token, "cloud");
-    const possibleWorkspaces = workspaces.workspaces.filter(({ options }) => options.documents);
+    const cloud = folder ? { all: {}, homes: [] } as Documents : await getWorkspace(account, token, "cloud", "Cloud");
+    const possibleWorkspaces = workspaces.workspaces.filter(({ options }) => options.documents).map(({ id, ...data }) => ({ ...data, id: `\\${Object.keys(cloud.all)[0]?.split("\\")?.[1]}\\W\\${id}\\` }));
     let workspacesDocuments: Documents = {
         all: {
             "workspaces": {
                 id: "workspaces",
                 name: "Espaces de travail",
                 kind: "folder",
+                parents: [],
                 children: [...possibleWorkspaces.map(({ id }) => id), cloud.all[Object.keys(cloud.all).sort((a, b) => a.length - b.length)[0]]?.id],
             }
         },
@@ -33,11 +34,27 @@ export async function getDocuments(account: Account, token: string, raw: APIAcco
             date,
             owner,
             type,
-            _raw: workspaces._raw.find(({ id: i }) => i === id),
+            parents: [],
+            _raw: workspaces._raw.find(({ id: i }) => i?.toString() === id?.split("\\")?.[3]),
         };
     });
 
-    return { workspaces, documents: folder ? await getWorkspace(account, token, folder) : fusion(await getCategories(account, token), fusion(cloud, workspacesDocuments)) };
+    return {
+        workspaces,
+        documents:
+            folder ?
+                folder.toString().indexOf("\\") === -1 ?
+                    await getCategories(account, token).then(({ all }) => {
+                        let a = {};
+                        a[folder] = all[folder];
+                        a[folder]?.children?.forEach((child: Id) => {
+                            a[child] = all[child];
+                        })
+                        return { all: a, homes: [] };
+                    })
+                    : await getWorkspace(account, token, folder, folder.toString().split("\\")[2] === "W" ? workspaces.workspaces.find(({ id }) => id?.toString() === folder.toString().split("\\")[3])?.name : "Cloud")
+                : fusion(await getCategories(account, token), fusion(cloud, workspacesDocuments))
+    };
 };
 
 export async function getDocument(token: string, document: Document): Promise<DocumentData> {
@@ -125,7 +142,7 @@ export async function getCategories(account: Account, token: string): Promise<Do
         )
 };
 
-export async function getWorkspace(account: Account, token: string, folder: Id): Promise<Documents> {
+export async function getWorkspace(account: Account, token: string, folder: Id, name: string): Promise<Documents> {
     const splitFolder = folder.toString().split("\\");
     let [_, _1, t, id, ...folderArr] = splitFolder;
     if (t !== "W") {
@@ -134,28 +151,42 @@ export async function getWorkspace(account: Account, token: string, folder: Id):
     if (splitFolder.length === 1) {
         id = folder.toString();
     }
-    return request<[APICloudDocument]>(`cloud/${id === "cloud" ? `${account.type === "STUDENT" || account.type === "PARENT" ? "E" : account.type === "TEACHER" ? "P" : "A"}/${account.id}` : `W/${id}`}?idFolder=${folderArr.length ? encodeURI("\\" + folderArr.join("\\")): ""}`, { token })
+    return request<[APICloudDocument]>(`cloud/${id === "cloud" ? `${account.type === "STUDENT" || account.type === "PARENT" ? "E" : account.type === "TEACHER" ? "P" : "A"}/${account.id}` : `W/${id}`}?idFolder=${folderArr.length ? encodeURI("\\" + folderArr.join("\\")): "\\"}`, { token })
         .then(([document]) => {
             let all = {};
             function doc(raw: APICloudDocument) {
                 raw.children?.forEach(doc);
 
+                let parents = [];
+                let idArray = raw.id.split("\\");
+                if (raw.type !== "folder") {
+                    idArray = ["", ...idArray.slice(4)];
+                }
+                const firstArray = idArray.findIndex(id => id === "W" || id === "E" || id === "P" || id === "A") + 1;
+                for (let i = firstArray; i < idArray.length - 1; i++) {
+                    if (idArray[i + 1]) {
+                        let id = idArray.slice(0, i + 1).join("\\") + (i === firstArray ? "\\" : "");
+                        parents.push({ id, name: (idArray[i] === "" || idArray[i] === "/" || i === firstArray) ? name : idArray[i] });
+                    }
+                }
+
                 all[raw.id] = {
                     id: raw.id,
-                    name: raw.libelle === "/" && !folderArr.length && id === "cloud" ? "Cloud" : raw.libelle,
+                    name: !raw.libelle || (raw.libelle === "/" && (!folderArr.length || (folderArr.length === 1 && folderArr[0] === ""))) ? name : raw.libelle,
                     kind: raw.type === "folder" ? "folder" : raw.url ? "url" : "file",
                     type: raw.type,
                     children: raw.children?.map(({ id }) => id),
+                    parents,
                     size: raw.taille,
                     date: new Date(raw.date?.replace(" ", "T")),
                     owner: raw.proprietaire && `${raw.proprietaire.prenom} ${raw.proprietaire.nom}`,
                     _raw: raw,
-                };
+                } as Document;
             };
 
             doc(document);
 
-            return { all, homes: [document.id] };
+            return { all, homes: [] };
         }
     );
 };

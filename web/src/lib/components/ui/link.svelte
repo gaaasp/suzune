@@ -7,7 +7,7 @@
     let className: string = "";
     export { className as class };
 </script>
-<a {href} class={cn({
+<a on:click {href} class={cn({
     "text-highlight hover:text-highlight-light focus:text-highlight-light active:text-highlight-dark": highlight,
     "hover:underline focus:underline": highlight || underline,
 }, className)}>

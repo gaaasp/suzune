@@ -6,8 +6,9 @@
 
     export let values: T[] | undefined;
     export let empty: string;
+    export let elevated = false;
 </script>
-<Card>
+<Card {elevated}>
     {#if values}
         {#each values as value, i (value.id)}
             {#if i !== 0}

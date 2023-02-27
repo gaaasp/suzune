@@ -9,7 +9,7 @@
             { name: "Homeworks", path: "/homeworks" },
             { name: "Grades", path: "/grades", alts: ["[integration]/grades/[grade]", "[integration]/subjects/[subject]", "[integration]/average"] },
             { name: "Messages", path: "/messages" },
-            { name: "Documents", path: "/documents" },
+            { name: "Documents", path: "/documents", alts: ["[integration]/folders/[folder]", "[integration]/folders/[folder]/[file]"] },
             { name: "Events", path: "/events" },
             { name: "Remarks", path: "/remarks" },
         ] as { name, path, alts } (path)}

@@ -6,6 +6,7 @@ export type Document = {
     kind: "folder" | "file" | "url";
     type?: string;
     children?: Id[];
+    parents: { id: Id; name: string }[];
     size?: number;
     date?: Date;
     owner?: string;

@@ -47,7 +47,7 @@ export class Account {
         let i = this.integrations;
         if (integrations) {
             const parsedIntegrations = integrations.split(",");
-            i = i.filter(integration => parsedIntegrations.find(id => id === integration.id));
+            i = i.filter(integration => parsedIntegrations.find(id => id === integration.id?.toString()));
         }
         return Promise.all(i.map(async integration => ({
             id: integration.id,
