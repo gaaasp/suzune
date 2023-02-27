@@ -8,7 +8,7 @@
     import { onMount } from "svelte";
 
     onMount(() => {
-        loadGrades($period, $i);
+        loadGrades($period, $i, $grades);
     });
 
     $: integration = $grades?.find(({ id }) => id?.toString() === $page.params.integration);

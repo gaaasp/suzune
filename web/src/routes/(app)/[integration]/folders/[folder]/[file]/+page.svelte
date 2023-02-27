@@ -3,32 +3,24 @@
     import { DocumentParents } from "$lib/components/documents";
     import { Skeleton, SkeletonGroup } from "$lib/components/loading";
     import { Back, Card, MainHeader, Text, Wrapper } from "$lib/components/ui";
-    import { loadDocuments } from "$lib/load";
     import { documents } from "$lib/stores";
     import { capitalize, cn, formatDate, formatSize, list, request, serverURL } from "$lib/utils";
     import { renderPDF } from "$lib/utils/pdf";
     import { onMount } from "svelte";
 
-    let content: string;
-    let type: string;
-    let pdf: HTMLElement;
 
     const path = `documents/${encodeURIComponent($page.params.file)}?integrations=${$page.params.integration}`;
     const url = serverURL(path);
 
-    onMount(() => {
-        loadDocuments($page.params.integration, $page.params.folder);
-        request(path, { custom: true })
-            .then(async res => {
-                type = res.headers.get("content-type");
-                if (type === "application/pdf") {
-                    const ab = await res.arrayBuffer();
-                    const child = await renderPDF(ab, pdf);
-                    pdf.appendChild(child);
-                } else {
-                    content = await res.text();
-                }
-            });
+    export let data: any;
+    $: content = data.content as string | ArrayBuffer;
+    $: type = data.type as string;
+    let pdf: HTMLElement;
+
+    onMount(async () => {
+        if (type === "application/pdf") {
+            pdf.appendChild(await renderPDF(content as ArrayBuffer, pdf));
+        }
     });
 
     $: all = $documents?.find(({ id }) => id?.toString() === $page.params.integration)?.data?.all;
@@ -36,7 +28,7 @@
 </script>
 <Wrapper title={file?.name || "File"}>
     <MainHeader slot="header">
-        <Back href={`/${$page.params.integration}/folders/${encodeURIComponent($page.params.folder)}`} />
+        <Back href={file?.parents?.length ? `/${$page.params.integration}/folders/${encodeURIComponent(file?.parents[file.parents.length - 1]?.id)}` : "/documents"} />
         <div class="sm:flex sm:items-center sm:justify-between space-y-2 sm:space-y-0">
             {#if file}
                 <div>

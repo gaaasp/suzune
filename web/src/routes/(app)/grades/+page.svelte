@@ -12,7 +12,7 @@
     $: p = periods?.[$period || 0];
 
     onMount(() => {
-        loadGrades($period, $integration);
+        loadGrades($period, $integration, $grades);
     });
 
 </script>
@@ -42,7 +42,7 @@
             </Labelled>
         </a>
     </MainHeader>
-    <List empty="No subjects" let:child={subject} values={p?.subjects}>
+    <List elevated empty="No subjects" let:child={subject} values={p?.subjects}>
         <Subject {subject} denominator={i?.data?.denominator} subjectHref={`/${i?.id}/subjects/${subject.id}`} gradeHref={({ id }) => `${i?.id}/grades/${id}`} />
     </List>
 </Wrapper>

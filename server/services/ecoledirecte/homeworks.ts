@@ -4,7 +4,7 @@ import { request } from "./request";
 import { APIDayHomeworks, APIHomeworks } from "./types/index";
 import { decodeText } from "./utils";
 
-export async function getHomeworks(account: Account, token: string, start?: string, end?: string) {
+export async function getHomeworks(account: Account, token: string, start?: string, end?: string): Promise<Homework[]> {
     if (start && end) {
         let homeworks = [];
         for (let day = new Date(start); day <= new Date(end); day.setDate(day.getDate() + 1)) {

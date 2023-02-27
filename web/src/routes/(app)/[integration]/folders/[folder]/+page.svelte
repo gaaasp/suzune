@@ -3,12 +3,8 @@
     import { DocumentParents, DocumentsList } from "$lib/components/documents";
     import { Skeleton, SkeletonGroup } from "$lib/components/loading";
     import { Back, MainHeader, Text, Wrapper } from "$lib/components/ui";
-    import { loadDocuments } from "$lib/load";
     import { documents } from "$lib/stores";
     import { capitalize, formatDate, formatSize, list } from "$lib/utils";
-    import { onMount } from "svelte";
-
-    onMount(() => loadDocuments($page.params.integration, $page.params.folder));
 
     $: all = $documents?.find(({ id }) => id?.toString() === $page.params.integration)?.data?.all;
     $: folder = all?.[$page.params.folder];
@@ -29,5 +25,5 @@
         {/if}
     </MainHeader>
     <DocumentParents document={folder} />
-    <DocumentsList click={(document) => document.kind === "folder" && loadDocuments($page.params.integration, encodeURIComponent(document.id))} document={folder} all={all || {}} integration={$page.params.integration} />
+    <DocumentsList document={folder} all={all || {}} integration={$page.params.integration} />
 </Wrapper>

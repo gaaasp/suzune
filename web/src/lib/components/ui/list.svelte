@@ -2,7 +2,7 @@
     import { Card, Separator, Text } from ".";
     import { Skeleton, SkeletonGroup } from "../loading";
 
-    type T = $$Generic<{ id: string | number }>;
+    type T = $$Generic;
 
     export let values: T[] | undefined;
     export let empty: string;
@@ -10,7 +10,7 @@
 </script>
 <Card {elevated}>
     {#if values}
-        {#each values as value, i (value.id)}
+        {#each values as value, i}
             {#if i !== 0}
                 <Separator />
             {/if}

@@ -1,12 +1,9 @@
 <script lang="ts">
     import { DocumentsList } from "$lib/components/documents";
     import { Text, Wrapper } from "$lib/components/ui";
-    import { loadDocuments } from "$lib/load";
     import { documents } from "$lib/stores";
-    import { onMount } from "svelte";
-
-    onMount(() => loadDocuments());
 </script>
+
 <Wrapper title="Documents">
     {#if $documents}
         {#each $documents as integration}

@@ -29,7 +29,14 @@ export class EcoleDirecteService extends Service {
             grades: () => getGrades(this.account, this.#token),
             messages: ({ type, binder }: { type: MessageType; binder: Id }) => getMessages(this.account, this.#token, type, binder),
             message: ({ id, type }: { type: MessageType; id: Id }) => getMessage(this.account, this.#token, id, type),
-            homeworks: ({ start, end }: { start: string; end: string }) => getHomeworks(this.account, this.#token, start, end),
+            homeworks: ({ start, end }: { start: string; end: string }) => getHomeworks(this.account, this.#token, start, end).then(homeworks => {
+                homeworks.forEach(({ documents }) => {
+                    documents.forEach(document => {
+                        this.#documents = { ...this.#documents, [document.id]: document };
+                    })
+                });
+                return homeworks;
+            }),
             events: ({ start, end }: { start: string, end: string }) => getEvents(this.account, this.#token, start, end),
             remarks: () => getRemarks(this.account, this.#token),
         });
